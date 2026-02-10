@@ -2,18 +2,19 @@ import fs from "node:fs";
 import path from "node:path";
 
 const API_URL = process.env.SHEET_API_URL || "";
-const SITE_DOMAIN = (process.env.SITE_DOMAIN || "").trim(); // e.g. preview.madperfume.co.il
+const SITE_DOMAIN = (process.env.SITE_DOMAIN || "").trim(); // optional
 
 if (!API_URL) {
   console.error("ERROR: Missing SHEET_API_URL (set it in GitHub Actions vars).");
   process.exit(1);
 }
 
-const OUT_DIR = path.resolve("dist");
+// ✅ مهم: نخلي الإخراج على docs عشان GitHub Pages ينشره
+const OUT_DIR = path.resolve("docs");
 fs.rmSync(OUT_DIR, { recursive: true, force: true });
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
-function esc(s="") {
+function esc(s = "") {
   return String(s)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -22,7 +23,7 @@ function esc(s="") {
     .replaceAll("'", "&#39;");
 }
 
-function codeBase(code="") {
+function codeBase(code = "") {
   let s = String(code).toUpperCase().trim();
   s = s.replace(/^XM\s*/i, "");
   s = s.replaceAll(".", "");
@@ -41,7 +42,7 @@ function pickName(p, lang) {
 
 function baseUrl() {
   if (SITE_DOMAIN) return `https://${SITE_DOMAIN}`;
-  return "";
+  return ""; // لو فاضي رح نترك og:url فاضي عادي
 }
 
 function buildHtml(p, lang) {
@@ -144,7 +145,7 @@ function writeFile(filePath, content) {
 }
 
 function buildIndex() {
-  const domain = SITE_DOMAIN ? `https://${SITE_DOMAIN}` : "(your GitHub Pages URL)";
+  const domain = SITE_DOMAIN ? `https://${SITE_DOMAIN}` : "https://abomkdad.github.io/bot1";
   const html = `<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -160,7 +161,7 @@ function buildIndex() {
 <body>
   <div class="box">
     <h1 style="margin-top:0">MAD Preview Pages</h1>
-    <p>البوت يرسل رابط Preview بالشكل:</p>
+    <p>روابط الـPreview:</p>
     <p>عربي: <code>${domain}/p/ar/&lt;code_key&gt;/</code></p>
     <p>عبري: <code>${domain}/p/he/&lt;code_key&gt;/</code></p>
     <p>مثال: <code>${domain}/p/ar/W183_MAN/</code></p>
@@ -173,6 +174,10 @@ function buildIndex() {
 function writeCname() {
   if (!SITE_DOMAIN) return;
   writeFile(path.join(OUT_DIR, "CNAME"), SITE_DOMAIN + "\n");
+}
+
+function writeNoJekyll() {
+  writeFile(path.join(OUT_DIR, ".nojekyll"), "");
 }
 
 (async () => {
@@ -196,7 +201,7 @@ function writeCname() {
 
   buildIndex();
   writeCname();
+  writeNoJekyll();
 
   console.log("Build done. Output:", OUT_DIR);
 })();
-

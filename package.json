@@ -1,0 +1,11 @@
+{
+  "name": "mad-preview-pages",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build/build.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

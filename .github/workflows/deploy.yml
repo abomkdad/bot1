@@ -26,13 +26,15 @@ jobs:
         with:
           node-version: 20
 
-      - name: Build (Sheet -> dist)
+      - name: Install
+        run: npm install
+
+      - name: Build (Sheet -> docs)
         env:
           SHEET_API_URL: ${{ vars.SHEET_API_URL }}
           SITE_DOMAIN: ${{ vars.SITE_DOMAIN }}
         run: |
           npm run build
-          touch dist/.nojekyll
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -40,7 +42,7 @@ jobs:
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: docs
 
   deploy:
     needs: build
